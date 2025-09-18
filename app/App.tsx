@@ -1,93 +1,215 @@
-import React, { useState } from 'react';
-import { Copy, Settings, FileText, Zap } from 'lucide-react';
-import { CourseInfo, ChannelStyle, TemplateStyle, ExtraOptions, PromptConfig } from './types';
-import { channels } from './data/channels';
-import { templates } from './data/templates';
-import { generatePrompt } from './utils/promptGenerator';
+import React, { useState, useEffect } from "react";
+import {
+  Copy,
+  Settings,
+  FileText,
+  Zap,
+  CheckCircle,
+  XCircle,
+  X,
+} from "lucide-react";
+import {
+  CourseInfo,
+  ChannelStyle,
+  TemplateStyle,
+  ExtraOptions,
+  PromptConfig,
+} from "./types";
+import { channels } from "./data/channels";
+import { templates } from "./data/templates";
+import { generatePrompt } from "./utils/promptGenerator";
+
+interface ToastProps {
+  type: "success" | "error";
+  message: string;
+  onClose: () => void;
+}
+
+const Toast: React.FC<ToastProps> = ({ type, message, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div
+      className={`fixed top-4 right-4 z-50 flex items-center p-4 rounded-lg shadow-lg transition-all duration-300 ${
+        type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+      }`}
+    >
+      {type === "success" ? (
+        <CheckCircle className="mr-2" size={20} />
+      ) : (
+        <XCircle className="mr-2" size={20} />
+      )}
+      <span className="mr-2">{message}</span>
+      <button
+        onClick={onClose}
+        className="ml-auto hover:bg-black hover:bg-opacity-20 rounded p-1 transition-colors"
+      >
+        <X size={16} />
+      </button>
+    </div>
+  );
+};
 
 function App() {
   const [courseInfo, setCourseInfo] = useState<CourseInfo>({
-    courseName: '',
-    startDate: '',
-    duration: '',
-    learningMode: 'online',
-    keyHighlights: [''],
-    registrationLink: '',
-    relatedHashtags: ['']
+    courseName: "",
+    startDate: "",
+    duration: "",
+    learningMode: "online",
+    keyHighlights: [""],
+    registrationLink: "",
+    relatedHashtags: [""],
   });
 
-  const [selectedChannel, setSelectedChannel] = useState<ChannelStyle | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateStyle | null>(null);
+  const [selectedChannel, setSelectedChannel] = useState<ChannelStyle | null>(
+    null
+  );
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<TemplateStyle | null>(null);
   const [extraOptions, setExtraOptions] = useState<ExtraOptions>({
-    contentLength: 'medium',
+    contentLength: "medium",
     withEmojis: true,
-    urgencyToggle: false
+    urgencyToggle: false,
   });
 
-  const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
+  const [generatedPrompt, setGeneratedPrompt] = useState<string>("");
   const [copied, setCopied] = useState<boolean>(false);
+  const [toast, setToast] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+
+  const showToast = (type: "success" | "error", message: string) => {
+    setToast({ type, message });
+  };
+
+  const hideToast = () => {
+    setToast(null);
+  };
 
   const handleCourseInfoChange = (field: keyof CourseInfo, value: any) => {
-    setCourseInfo(prev => ({
+    setCourseInfo((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-  const handleArrayChange = (field: 'keyHighlights' | 'relatedHashtags', index: number, value: string) => {
-    setCourseInfo(prev => ({
+  const handleArrayChange = (
+    field: "keyHighlights" | "relatedHashtags",
+    index: number,
+    value: string
+  ) => {
+    setCourseInfo((prev) => ({
       ...prev,
-      [field]: prev[field].map((item, i) => i === index ? value : item)
+      [field]: prev[field].map((item, i) => (i === index ? value : item)),
     }));
   };
 
-  const addArrayItem = (field: 'keyHighlights' | 'relatedHashtags') => {
-    setCourseInfo(prev => ({
+  const addArrayItem = (field: "keyHighlights" | "relatedHashtags") => {
+    setCourseInfo((prev) => ({
       ...prev,
-      [field]: [...prev[field], '']
+      [field]: [...prev[field], ""],
     }));
   };
 
-  const removeArrayItem = (field: 'keyHighlights' | 'relatedHashtags', index: number) => {
-    setCourseInfo(prev => ({
+  const removeArrayItem = (
+    field: "keyHighlights" | "relatedHashtags",
+    index: number
+  ) => {
+    setCourseInfo((prev) => ({
       ...prev,
-      [field]: prev[field].filter((_, i) => i !== index)
+      [field]: prev[field].filter((_, i) => i !== index),
     }));
   };
 
   const generateContent = () => {
-    if (!selectedChannel || !selectedTemplate) {
-      alert('Vui lòng chọn kênh truyền thông và mẫu nội dung!');
-      return;
+    try {
+      // Kiểm tra các trường bắt buộc
+      if (!courseInfo.courseName.trim()) {
+        showToast("error", "Vui lòng nhập tên khóa học!");
+        return;
+      }
+
+      if (!courseInfo.startDate) {
+        showToast("error", "Vui lòng chọn ngày khai giảng!");
+        return;
+      }
+
+      if (!courseInfo.duration.trim()) {
+        showToast("error", "Vui lòng nhập thời lượng khóa học!");
+        return;
+      }
+
+      if (!courseInfo.registrationLink.trim()) {
+        showToast("error", "Vui lòng nhập link đăng ký!");
+        return;
+      }
+
+      if (!selectedChannel) {
+        showToast("error", "Vui lòng chọn kênh truyền thông!");
+        return;
+      }
+
+      if (!selectedTemplate) {
+        showToast("error", "Vui lòng chọn mẫu nội dung!");
+        return;
+      }
+
+      const config: PromptConfig = {
+        courseInfo: {
+          ...courseInfo,
+          keyHighlights: courseInfo.keyHighlights.filter(
+            (h) => h.trim() !== ""
+          ),
+          relatedHashtags: courseInfo.relatedHashtags.filter(
+            (h) => h.trim() !== ""
+          ),
+        },
+        channelStyle: selectedChannel,
+        templateStyle: selectedTemplate,
+        extraOptions,
+      };
+
+      const prompt = generatePrompt(config);
+
+      if (!prompt || prompt.trim() === "") {
+        showToast("error", "Có lỗi xảy ra khi tạo prompt. Vui lòng thử lại!");
+        return;
+      }
+
+      setGeneratedPrompt(prompt);
+      showToast("success", "Tạo prompt thành công! 🎉");
+    } catch (error) {
+      console.error("Error generating prompt:", error);
+      showToast("error", "Có lỗi xảy ra khi tạo prompt. Vui lòng thử lại!");
     }
-
-    const config: PromptConfig = {
-      courseInfo: {
-        ...courseInfo,
-        keyHighlights: courseInfo.keyHighlights.filter(h => h.trim() !== ''),
-        relatedHashtags: courseInfo.relatedHashtags.filter(h => h.trim() !== '')
-      },
-      channelStyle: selectedChannel,
-      templateStyle: selectedTemplate,
-      extraOptions
-    };
-
-    const prompt = generatePrompt(config);
-    setGeneratedPrompt(prompt);
   };
 
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(generatedPrompt);
       setCopied(true);
+      showToast("success", "Đã sao chép prompt vào clipboard!");
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      console.error("Failed to copy: ", err);
+      showToast("error", "Không thể sao chép. Vui lòng thử lại!");
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Toast Notification */}
+      {toast && (
+        <Toast type={toast.type} message={toast.message} onClose={hideToast} />
+      )}
+
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -95,7 +217,8 @@ function App() {
             CUSC Prompt Generator
           </h1>
           <p className="text-gray-600">
-            Tạo nội dung marketing chuyên nghiệp cho Trung tâm Công nghệ Phần mềm Đại học Cần Thơ
+            Tạo nội dung marketing chuyên nghiệp cho Trung tâm Công nghệ Phần
+            mềm Đại học Cần Thơ
           </p>
         </div>
 
@@ -108,7 +231,7 @@ function App() {
                 <FileText className="mr-2" size={20} />
                 Thông tin khóa học
               </h2>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -117,7 +240,9 @@ function App() {
                   <input
                     type="text"
                     value={courseInfo.courseName}
-                    onChange={(e) => handleCourseInfoChange('courseName', e.target.value)}
+                    onChange={(e) =>
+                      handleCourseInfoChange("courseName", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="VD: Khóa học lập trình Python căn bản"
                   />
@@ -129,9 +254,11 @@ function App() {
                       Ngày khai giảng *
                     </label>
                     <input
-                      type="text"
+                      type="date"
                       value={courseInfo.startDate}
-                      onChange={(e) => handleCourseInfoChange('startDate', e.target.value)}
+                      onChange={(e) =>
+                        handleCourseInfoChange("startDate", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="VD: 15/01/2024"
                     />
@@ -143,7 +270,9 @@ function App() {
                     <input
                       type="text"
                       value={courseInfo.duration}
-                      onChange={(e) => handleCourseInfoChange('duration', e.target.value)}
+                      onChange={(e) =>
+                        handleCourseInfoChange("duration", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="VD: 3 tháng"
                     />
@@ -156,7 +285,12 @@ function App() {
                   </label>
                   <select
                     value={courseInfo.learningMode}
-                    onChange={(e) => handleCourseInfoChange('learningMode', e.target.value as 'online' | 'offline' | 'hybrid')}
+                    onChange={(e) =>
+                      handleCourseInfoChange(
+                        "learningMode",
+                        e.target.value as "online" | "offline" | "hybrid"
+                      )
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="online">Online</option>
@@ -174,13 +308,21 @@ function App() {
                       <input
                         type="text"
                         value={highlight}
-                        onChange={(e) => handleArrayChange('keyHighlights', index, e.target.value)}
+                        onChange={(e) =>
+                          handleArrayChange(
+                            "keyHighlights",
+                            index,
+                            e.target.value
+                          )
+                        }
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="VD: Học với chuyên gia giàu kinh nghiệm"
                       />
                       {courseInfo.keyHighlights.length > 1 && (
                         <button
-                          onClick={() => removeArrayItem('keyHighlights', index)}
+                          onClick={() =>
+                            removeArrayItem("keyHighlights", index)
+                          }
                           className="ml-2 px-2 py-2 text-red-600 hover:bg-red-50 rounded"
                         >
                           ×
@@ -189,7 +331,7 @@ function App() {
                     </div>
                   ))}
                   <button
-                    onClick={() => addArrayItem('keyHighlights')}
+                    onClick={() => addArrayItem("keyHighlights")}
                     className="text-blue-600 hover:text-blue-800 text-sm"
                   >
                     + Thêm điểm nổi bật
@@ -203,7 +345,9 @@ function App() {
                   <input
                     type="url"
                     value={courseInfo.registrationLink}
-                    onChange={(e) => handleCourseInfoChange('registrationLink', e.target.value)}
+                    onChange={(e) =>
+                      handleCourseInfoChange("registrationLink", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="https://cusc.ctu.edu.vn/dang-ky"
                   />
@@ -218,13 +362,21 @@ function App() {
                       <input
                         type="text"
                         value={hashtag}
-                        onChange={(e) => handleArrayChange('relatedHashtags', index, e.target.value)}
+                        onChange={(e) =>
+                          handleArrayChange(
+                            "relatedHashtags",
+                            index,
+                            e.target.value
+                          )
+                        }
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="VD: #Python #Programming"
                       />
                       {courseInfo.relatedHashtags.length > 1 && (
                         <button
-                          onClick={() => removeArrayItem('relatedHashtags', index)}
+                          onClick={() =>
+                            removeArrayItem("relatedHashtags", index)
+                          }
                           className="ml-2 px-2 py-2 text-red-600 hover:bg-red-50 rounded"
                         >
                           ×
@@ -233,7 +385,7 @@ function App() {
                     </div>
                   ))}
                   <button
-                    onClick={() => addArrayItem('relatedHashtags')}
+                    onClick={() => addArrayItem("relatedHashtags")}
                     className="text-blue-600 hover:text-blue-800 text-sm"
                   >
                     + Thêm hashtag
@@ -254,12 +406,16 @@ function App() {
                     onClick={() => setSelectedChannel(channel)}
                     className={`p-3 border-2 rounded-lg cursor-pointer transition-colors ${
                       selectedChannel?.id === channel.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
-                    <h3 className="font-medium text-gray-800">{channel.name}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{channel.description}</p>
+                    <h3 className="font-medium text-gray-800">
+                      {channel.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {channel.description}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -277,12 +433,16 @@ function App() {
                     onClick={() => setSelectedTemplate(template)}
                     className={`p-3 border-2 rounded-lg cursor-pointer transition-colors ${
                       selectedTemplate?.id === template.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
-                    <h3 className="font-medium text-gray-800">{template.name}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{template.description}</p>
+                    <h3 className="font-medium text-gray-800">
+                      {template.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {template.description}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -294,7 +454,7 @@ function App() {
                 <Settings className="mr-2" size={20} />
                 Tùy chọn bổ sung
               </h2>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -302,7 +462,15 @@ function App() {
                   </label>
                   <select
                     value={extraOptions.contentLength}
-                    onChange={(e) => setExtraOptions(prev => ({ ...prev, contentLength: e.target.value as 'short' | 'medium' | 'detailed' }))}
+                    onChange={(e) =>
+                      setExtraOptions((prev) => ({
+                        ...prev,
+                        contentLength: e.target.value as
+                          | "short"
+                          | "medium"
+                          | "detailed",
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="short">Ngắn gọn (50-100 từ)</option>
@@ -316,7 +484,12 @@ function App() {
                     type="checkbox"
                     id="emojis"
                     checked={extraOptions.withEmojis}
-                    onChange={(e) => setExtraOptions(prev => ({ ...prev, withEmojis: e.target.checked }))}
+                    onChange={(e) =>
+                      setExtraOptions((prev) => ({
+                        ...prev,
+                        withEmojis: e.target.checked,
+                      }))
+                    }
                     className="mr-2"
                   />
                   <label htmlFor="emojis" className="text-sm text-gray-700">
@@ -329,7 +502,12 @@ function App() {
                     type="checkbox"
                     id="urgency"
                     checked={extraOptions.urgencyToggle}
-                    onChange={(e) => setExtraOptions(prev => ({ ...prev, urgencyToggle: e.target.checked }))}
+                    onChange={(e) =>
+                      setExtraOptions((prev) => ({
+                        ...prev,
+                        urgencyToggle: e.target.checked,
+                      }))
+                    }
                     className="mr-2"
                   />
                   <label htmlFor="urgency" className="text-sm text-gray-700">
@@ -360,12 +538,12 @@ function App() {
                   onClick={copyToClipboard}
                   className={`flex items-center px-3 py-2 rounded-md transition-colors ${
                     copied
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                      ? "bg-green-100 text-green-700"
+                      : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                   }`}
                 >
                   <Copy className="mr-1" size={16} />
-                  {copied ? 'Đã sao chép!' : 'Sao chép'}
+                  {copied ? "Đã sao chép!" : "Sao chép"}
                 </button>
               )}
             </div>

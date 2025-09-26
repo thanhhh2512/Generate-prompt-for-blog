@@ -22,7 +22,7 @@ export const templates: TemplateStyle[] = [
     {
         id: 'natural',
         name: 'Quảng cáo tự nhiên',
-        description: 'Viết bằng giọng điệu tự nhiên, gần gũi như một người thật chia sẻ trải nghiệm hoặc quan sát chân thực. Tránh nghe như quảng cáo chính thức. Câu văn ngắn, thân thiện và dễ theo dõi.',
-        structure: 'Bắt đầu với câu chuyện cá nhân nhỏ, khoảnh khắc đời thường, hoặc quan sát thường ngày, bao gồm các chi tiết dễ đồng cảm. Kết nối câu chuyện đó với khóa học một cách tự nhiên, cho thấy khóa học tạo ra sự khác biệt trong cuộc sống thực. Làm nổi bật chi tiết khóa học (tên khóa học chính thức, ngày khai giảng, thời lượng, hình thức, lợi ích chính, link đăng ký). Thêm lời kêu gọi hành động rõ ràng (khuyến khích đăng ký). Luôn bao gồm hashtags ở cuối.'
+        description: 'Viết bằng giọng điệu tự nhiên, gần gũi như một người thật chia sẻ trải nghiệm hoặc quan sát chân thực. Tránh nghe như quảng cáo chính thức. Câu văn ngắn, thân thiện và dễ theo dõi',
+        structure: 'Bắt đầu với câu chuyện cá nhân nhỏ, khoảnh khắc đời thường, hoặc quan sát thường ngày, bao gồm các chi tiết dễ đồng cảm. Kết nối câu chuyện đó với khóa học một cách tự nhiên, cho thấy khóa học tạo ra sự khác biệt trong cuộc sống thực. Làm nổi bật chi tiết khóa học (tên khóa học chính thức, ngày khai giảng, thời lượng, hình thức, lợi ích chính, link đăng ký). Thêm lời kêu gọi hành động rõ ràng (khuyến khích đăng ký). Luôn bao gồm hashtags ở cuối'
     }
 ];

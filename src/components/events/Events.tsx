@@ -12,7 +12,10 @@ import {
   Gift,
   Globe,
   Save,
+  CalendarIcon,
+  CircleCheckBig,
 } from "lucide-react";
+import { format } from "date-fns";
 import type {
   EventInfo,
   ChannelStyle,
@@ -27,6 +30,13 @@ import { generateEventPrompt } from "@/utils/promptGenerator";
 import { useSidebarContext } from "@/hooks/use-sidebar-context";
 import { useFormDataStore } from "@/stores/form-data-store";
 import { Button } from "../ui/button";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface ToastProps {
   type: "success" | "error";
@@ -315,7 +325,7 @@ function Events() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Tên sự kiện *
+                  Tên sự kiện <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -333,22 +343,138 @@ function Events() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Thời gian *
+                  Thời gian <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="datetime-local"
-                  value={eventInfo.time}
-                  onChange={(e) =>
-                    handleEventInfoChange("time", e.target.value)
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                />
+                <div className="grid grid-cols-2 gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full px-4 py-3 h-12 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all justify-start text-left font-normal",
+                          !eventInfo.time && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {eventInfo.time ? (
+                          format(new Date(eventInfo.time), "dd/MM/yyyy")
+                        ) : (
+                          <span>Chọn ngày</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={
+                          eventInfo.time ? new Date(eventInfo.time) : undefined
+                        }
+                        onSelect={(date) => {
+                          if (date) {
+                            const currentTime = eventInfo.time
+                              ? new Date(eventInfo.time)
+                              : new Date();
+                            const newDateTime = new Date(date);
+                            newDateTime.setHours(currentTime.getHours());
+                            newDateTime.setMinutes(currentTime.getMinutes());
+                            handleEventInfoChange(
+                              "time",
+                              newDateTime.toISOString().slice(0, 16)
+                            );
+                          }
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "px-4 py-3 h-12 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all justify-start text-left font-normal w-full",
+                          !eventInfo.time && "text-muted-foreground"
+                        )}
+                      >
+                        {eventInfo.time ? (
+                          format(new Date(eventInfo.time), "HH:mm")
+                        ) : (
+                          <span>Chọn giờ</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-4" align="start">
+                      <div className="flex items-center space-x-2">
+                        <div className="grid grid-cols-1">
+                          <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Giờ
+                          </label>
+                          <select
+                            value={
+                              eventInfo.time
+                                ? new Date(eventInfo.time).getHours()
+                                : 9
+                            }
+                            onChange={(e) => {
+                              const hours = parseInt(e.target.value);
+                              const currentTime = eventInfo.time
+                                ? new Date(eventInfo.time)
+                                : new Date();
+                              currentTime.setHours(hours);
+                              handleEventInfoChange(
+                                "time",
+                                currentTime.toISOString()
+                              );
+                            }}
+                            className="px-3 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          >
+                            {Array.from({ length: 24 }, (_, i) => (
+                              <option key={i} value={i}>
+                                {i.toString().padStart(2, "0")}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-1">
+                          <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Phút
+                          </label>
+                          <select
+                            value={
+                              eventInfo.time
+                                ? new Date(eventInfo.time).getMinutes()
+                                : 0
+                            }
+                            onChange={(e) => {
+                              const minutes = parseInt(e.target.value);
+                              const currentTime = eventInfo.time
+                                ? new Date(eventInfo.time)
+                                : new Date();
+                              currentTime.setMinutes(minutes);
+                              handleEventInfoChange(
+                                "time",
+                                currentTime.toISOString()
+                              );
+                            }}
+                            className="px-3 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          >
+                            {Array.from({ length: 60 }, (_, i) => (
+                              <option key={i} value={i}>
+                                {i.toString().padStart(2, "0")}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
 
               <div>
                 <label className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   <MapPin className="w-4 h-4 mr-1" />
-                  Địa điểm *
+                  Địa điểm <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -364,7 +490,7 @@ function Events() {
               <div className="md:col-span-2">
                 <label className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   <Users className="w-4 h-4 mr-1" />
-                  Đối tượng tham gia *
+                  Đối tượng tham gia <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -476,7 +602,7 @@ function Events() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                  Chọn kênh truyền thông *
+                  Chọn kênh truyền thông <span className="text-red-500">*</span>
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Chọn nền tảng để tối ưu nội dung
@@ -513,7 +639,7 @@ function Events() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                  Chọn mẫu nội dung *
+                  Chọn mẫu nội dung <span className="text-red-500">*</span>
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Chọn phong cách viết phù hợp
@@ -670,13 +796,9 @@ function Events() {
               {generatedPrompt && (
                 <Button
                   onClick={copyToClipboard}
-                  className={`flex items-center gap-2 px-4 py-2 h-14 w-20 rounded-xl font-medium transition-all ${
-                    copied
-                      ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                      : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 hover:scale-105"
-                  }`}
+                  className="flex items-center gap-2 px-4 py-2 h-14 w-20 rounded-xl font-medium transition-all bg-gray-200 dark:bg-blue-900/20 hover:bg-gray-300 dark:hover:bg-blue-900/30 text-gray-600 dark:text-green-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 "
                 >
-                  {copied ? "Đã sao chép!" : "Sao chép"}
+                  {copied ? <CircleCheckBig /> : "Sao chép"}
                 </Button>
               )}
             </div>

@@ -10,7 +10,10 @@ import {
   Hash,
   Globe,
   Save,
+  CalendarIcon,
+  CircleCheckBig,
 } from "lucide-react";
+import { format } from "date-fns";
 import type {
   CourseInfo,
   ChannelStyle,
@@ -25,6 +28,13 @@ import { generatePrompt } from "@/utils/promptGenerator";
 import { useSidebarContext } from "@/hooks/use-sidebar-context";
 import { useFormDataStore } from "@/stores/form-data-store";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface ToastProps {
   type: "success" | "error";
@@ -148,7 +158,6 @@ function Courses() {
     }
 
     try {
-      // Bao gồm tất cả dữ liệu: thông tin khóa học + tùy chọn bổ sung
       const completeData = {
         courseInfo,
         selectedChannel,
@@ -162,13 +171,13 @@ function Courses() {
         data: completeData as unknown as Record<string, unknown>,
       });
 
-      console.log("💾 Đã lưu khóa học (bao gồm tùy chọn bổ sung):", savedItem);
+      console.log("Đã lưu khóa học (bao gồm tùy chọn bổ sung):", savedItem);
       showToast(
         "success",
         `Đã lưu "${courseInfo.courseName}" vào danh sách! Dữ liệu sẽ được giữ nguyên dù bạn tải lại trang.`
       );
     } catch (error) {
-      console.error("❌ Lỗi khi lưu khóa học:", error);
+      console.error("Lỗi khi lưu khóa học:", error);
       showToast("error", "Không thể lưu khóa học. Vui lòng thử lại.");
     }
   };
@@ -213,7 +222,6 @@ function Courses() {
 
   const generateContent = () => {
     try {
-      // Kiểm tra các trường bắt buộc
       if (!courseInfo.courseName.trim()) {
         showToast("error", "Vui lòng nhập tên khóa học!");
         return;
@@ -315,7 +323,7 @@ function Courses() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Tên khóa học *
+                  Tên khóa học <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -333,21 +341,50 @@ function Courses() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Ngày khai giảng *
+                  Ngày khai giảng <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="date"
-                  value={courseInfo.startDate}
-                  onChange={(e) =>
-                    handleCourseInfoChange("startDate", e.target.value)
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full px-4 py-3 h-12 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all justify-start text-left font-normal",
+                        !courseInfo.startDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {courseInfo.startDate ? (
+                        format(new Date(courseInfo.startDate), "dd/MM/yyyy")
+                      ) : (
+                        <span>Chọn ngày khai giảng</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={
+                        courseInfo.startDate
+                          ? new Date(courseInfo.startDate)
+                          : undefined
+                      }
+                      onSelect={(date) => {
+                        if (date) {
+                          handleCourseInfoChange(
+                            "startDate",
+                            format(date, "yyyy-MM-dd")
+                          );
+                        }
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Thời lượng *
+                  Thời lượng <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -426,7 +463,7 @@ function Courses() {
               <div className="md:col-span-2">
                 <label className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   <Globe className="w-4 h-4 mr-1" />
-                  Link đăng ký *
+                  Link đăng ký <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="url"
@@ -492,7 +529,7 @@ function Courses() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                  Chọn kênh truyền thông *
+                  Chọn kênh truyền thông <span className="text-red-500">*</span>
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Chọn nền tảng để tối ưu nội dung
@@ -529,7 +566,7 @@ function Courses() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                  Chọn mẫu nội dung *
+                  Chọn mẫu nội dung <span className="text-red-500">*</span>
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Chọn phong cách viết phù hợp
@@ -686,13 +723,9 @@ function Courses() {
               {generatedPrompt && (
                 <Button
                   onClick={copyToClipboard}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl h-12 w-20 font-medium transition-all ${
-                    copied
-                      ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                      : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 hover:scale-105"
-                  }`}
+                  className="flex items-center gap-2 px-4 py-2 h-14 w-20 rounded-xl font-medium transition-all bg-gray-200 dark:bg-blue-900/20 hover:bg-gray-300 dark:hover:bg-blue-900/30 text-gray-600 dark:text-green-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 "
                 >
-                  {copied ? "Đã sao chép!" : "Sao chép"}
+                  {copied ? <CircleCheckBig /> : "Sao chép"}
                 </Button>
               )}
             </div>

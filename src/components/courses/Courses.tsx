@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Copy,
   Settings,
   FileText,
   Zap,
@@ -10,6 +9,7 @@ import {
   Plus,
   Hash,
   Globe,
+  Save,
 } from "lucide-react";
 import type {
   CourseInfo,
@@ -17,10 +17,14 @@ import type {
   TemplateStyle,
   ExtraOptions,
   PromptConfig,
-} from "@/lib//types";
+  CompleteCourseData,
+} from "@/lib/types";
 import { channels } from "@/data/channels";
 import { templates } from "@/data/templates";
 import { generatePrompt } from "@/utils/promptGenerator";
+import { useSidebarContext } from "@/hooks/use-sidebar-context";
+import { useFormDataStore } from "@/stores/form-data-store";
+import { Button } from "@/components/ui/button";
 
 interface ToastProps {
   type: "success" | "error";
@@ -62,6 +66,9 @@ const Toast: React.FC<ToastProps> = ({ type, message, onClose }) => {
 };
 
 function Courses() {
+  const { addItem } = useSidebarContext();
+  const { getCourseData, selectedItem, clearSelectedItem } = useFormDataStore();
+
   const [courseInfo, setCourseInfo] = useState<CourseInfo>({
     courseName: "",
     startDate: "",
@@ -96,6 +103,74 @@ function Courses() {
 
   const hideToast = () => {
     setToast(null);
+  };
+
+  // Load data from sidebar selection
+  useEffect(() => {
+    if (selectedItem?.type === "course") {
+      const courseData = getCourseData();
+      if (courseData) {
+        console.log("📚 Loading course data into form:", courseData);
+
+        // Kiểm tra xem dữ liệu có đầy đủ hay chỉ có courseInfo cũ
+        const dataAsRecord = courseData as unknown as Record<string, unknown>;
+        if (dataAsRecord.courseInfo) {
+          // Dữ liệu mới có đầy đủ thông tin
+          const completeData = courseData as unknown as CompleteCourseData;
+          setCourseInfo(completeData.courseInfo);
+          setSelectedChannel(completeData.selectedChannel || null);
+          setSelectedTemplate(completeData.selectedTemplate || null);
+          setExtraOptions(
+            completeData.extraOptions || {
+              contentLength: "medium",
+              withEmojis: true,
+              urgencyToggle: false,
+            }
+          );
+          console.log("✅ Đã tải đầy đủ dữ liệu bao gồm tùy chọn bổ sung");
+        } else {
+          // Dữ liệu cũ chỉ có courseInfo
+          setCourseInfo(courseData as unknown as CourseInfo);
+          console.log("⚠️ Chỉ tải được thông tin cơ bản (dữ liệu cũ)");
+        }
+
+        showToast("success", `Đã tải dữ liệu: "${selectedItem.title}"`);
+        // Clear selection after loading
+        setTimeout(() => clearSelectedItem(), 100);
+      }
+    }
+  }, [selectedItem, getCourseData, clearSelectedItem]);
+
+  const saveToSidebar = () => {
+    if (!courseInfo.courseName.trim()) {
+      showToast("error", "Tên khóa học không được để trống");
+      return;
+    }
+
+    try {
+      // Bao gồm tất cả dữ liệu: thông tin khóa học + tùy chọn bổ sung
+      const completeData = {
+        courseInfo,
+        selectedChannel,
+        selectedTemplate,
+        extraOptions,
+      };
+
+      const savedItem = addItem({
+        title: courseInfo.courseName.trim(),
+        type: "course",
+        data: completeData as unknown as Record<string, unknown>,
+      });
+
+      console.log("💾 Đã lưu khóa học (bao gồm tùy chọn bổ sung):", savedItem);
+      showToast(
+        "success",
+        `Đã lưu "${courseInfo.courseName}" vào danh sách! Dữ liệu sẽ được giữ nguyên dù bạn tải lại trang.`
+      );
+    } catch (error) {
+      console.error("❌ Lỗi khi lưu khóa học:", error);
+      showToast("error", "Không thể lưu khóa học. Vui lòng thử lại.");
+    }
   };
 
   const handleCourseInfoChange = (
@@ -212,7 +287,7 @@ function Courses() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-8xl mx-auto">
       {/* Toast Notification */}
       {toast && (
         <Toast type={toast.type} message={toast.message} onClose={hideToast} />
@@ -599,19 +674,28 @@ function Courses() {
                 </p>
               </div>
             </div>
-            {generatedPrompt && (
-              <button
-                onClick={copyToClipboard}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${
-                  copied
-                    ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                    : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 hover:scale-105"
-                }`}
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={saveToSidebar}
+                disabled={!courseInfo.courseName.trim()}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl h-12 w-20 font-medium transition-all bg-blue-100 dark:bg-blue-900/20 hover:bg-blue-200 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-400 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                <Copy className="w-4 h-4" />
-                {copied ? "Đã sao chép!" : "Sao chép"}
-              </button>
-            )}
+                <Save className="w-4 h-4" />
+                Lưu
+              </Button>
+              {generatedPrompt && (
+                <Button
+                  onClick={copyToClipboard}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl h-12 w-20 font-medium transition-all ${
+                    copied
+                      ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400"
+                      : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 hover:scale-105"
+                  }`}
+                >
+                  {copied ? "Đã sao chép!" : "Sao chép"}
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="p-6">

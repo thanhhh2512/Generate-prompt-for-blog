@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Copy,
   Settings,
   Calendar,
   Zap,
@@ -12,6 +11,7 @@ import {
   Users,
   Gift,
   Globe,
+  Save,
 } from "lucide-react";
 import type {
   EventInfo,
@@ -19,10 +19,14 @@ import type {
   EventTemplate,
   ExtraOptions,
   EventPromptConfig,
+  CompleteEventData,
 } from "@/lib/types";
 import { channels } from "@/data/channels";
 import { eventTemplates } from "@/data/eventTemplates";
 import { generateEventPrompt } from "@/utils/promptGenerator";
+import { useSidebarContext } from "@/hooks/use-sidebar-context";
+import { useFormDataStore } from "@/stores/form-data-store";
+import { Button } from "../ui/button";
 
 interface ToastProps {
   type: "success" | "error";
@@ -64,6 +68,9 @@ const Toast: React.FC<ToastProps> = ({ type, message, onClose }) => {
 };
 
 function Events() {
+  const { addItem } = useSidebarContext();
+  const { getEventData, selectedItem, clearSelectedItem } = useFormDataStore();
+
   const [eventInfo, setEventInfo] = useState<EventInfo>({
     name: "",
     time: "",
@@ -98,6 +105,74 @@ function Events() {
 
   const hideToast = () => {
     setToast(null);
+  };
+
+  // Load data from sidebar selection
+  useEffect(() => {
+    if (selectedItem?.type === "event") {
+      const eventData = getEventData();
+      if (eventData) {
+        console.log("📅 Loading event data into form:", eventData);
+
+        // Kiểm tra xem dữ liệu có đầy đủ hay chỉ có eventInfo cũ
+        const dataAsRecord = eventData as unknown as Record<string, unknown>;
+        if (dataAsRecord.eventInfo) {
+          // Dữ liệu mới có đầy đủ thông tin
+          const completeData = eventData as unknown as CompleteEventData;
+          setEventInfo(completeData.eventInfo);
+          setSelectedChannel(completeData.selectedChannel || null);
+          setSelectedTemplate(completeData.selectedTemplate || null);
+          setExtraOptions(
+            completeData.extraOptions || {
+              contentLength: "medium",
+              withEmojis: true,
+              urgencyToggle: false,
+            }
+          );
+          console.log("✅ Đã tải đầy đủ dữ liệu bao gồm tùy chọn bổ sung");
+        } else {
+          // Dữ liệu cũ chỉ có eventInfo
+          setEventInfo(eventData as unknown as EventInfo);
+          console.log("⚠️ Chỉ tải được thông tin cơ bản (dữ liệu cũ)");
+        }
+
+        showToast("success", `Đã tải dữ liệu: "${selectedItem.title}"`);
+        // Clear selection after loading
+        setTimeout(() => clearSelectedItem(), 100);
+      }
+    }
+  }, [selectedItem, getEventData, clearSelectedItem]);
+
+  const saveToSidebar = () => {
+    if (!eventInfo.name.trim()) {
+      showToast("error", "Tên sự kiện không được để trống");
+      return;
+    }
+
+    try {
+      // Bao gồm tất cả dữ liệu: thông tin sự kiện + tùy chọn bổ sung
+      const completeData = {
+        eventInfo,
+        selectedChannel,
+        selectedTemplate,
+        extraOptions,
+      };
+
+      const savedItem = addItem({
+        title: eventInfo.name.trim(),
+        type: "event",
+        data: completeData as unknown as Record<string, unknown>,
+      });
+
+      console.log("💾 Đã lưu sự kiện (bao gồm tùy chọn bổ sung):", savedItem);
+      showToast(
+        "success",
+        `Đã lưu "${eventInfo.name}" vào danh sách! Dữ liệu sẽ được giữ nguyên dù bạn tải lại trang.`
+      );
+    } catch (error) {
+      console.error("❌ Lỗi khi lưu sự kiện:", error);
+      showToast("error", "Không thể lưu sự kiện. Vui lòng thử lại.");
+    }
   };
 
   const handleEventInfoChange = (
@@ -212,7 +287,7 @@ function Events() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-8xl mx-auto">
       {/* Toast Notification */}
       {toast && (
         <Toast type={toast.type} message={toast.message} onClose={hideToast} />
@@ -583,19 +658,28 @@ function Events() {
                 </p>
               </div>
             </div>
-            {generatedPrompt && (
-              <button
-                onClick={copyToClipboard}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${
-                  copied
-                    ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                    : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 hover:scale-105"
-                }`}
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={saveToSidebar}
+                disabled={!eventInfo.name.trim()}
+                className="flex items-center gap-2 px-4 py-2 h-14 w-20 rounded-xl font-medium transition-all bg-green-200 dark:bg-blue-900/20 hover:bg-green-300 dark:hover:bg-blue-900/30 text-green-600 dark:text-green-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                <Copy className="w-4 h-4" />
-                {copied ? "Đã sao chép!" : "Sao chép"}
-              </button>
-            )}
+                <Save className="w-4 h-4" />
+                Lưu
+              </Button>
+              {generatedPrompt && (
+                <Button
+                  onClick={copyToClipboard}
+                  className={`flex items-center gap-2 px-4 py-2 h-14 w-20 rounded-xl font-medium transition-all ${
+                    copied
+                      ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400"
+                      : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 hover:scale-105"
+                  }`}
+                >
+                  {copied ? "Đã sao chép!" : "Sao chép"}
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="p-6">

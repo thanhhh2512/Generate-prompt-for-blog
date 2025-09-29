@@ -28,6 +28,14 @@ export interface ExtraOptions {
     urgencyToggle: boolean;
 }
 
+export interface SidebarItem {
+    id: string;
+    title: string;
+    createdAt: string;
+    type: 'course' | 'event';
+    data?: Record<string, unknown>;
+}
+
 export interface EventInfo {
     name: string;
     time: string;
@@ -56,5 +64,20 @@ export interface EventPromptConfig {
     eventInfo: EventInfo;
     channelStyle: ChannelStyle;
     templateStyle: EventTemplate;
+    extraOptions: ExtraOptions;
+}
+
+// Types for complete saved data (including extra options)
+export interface CompleteCourseData {
+    courseInfo: CourseInfo;
+    selectedChannel: ChannelStyle | null;
+    selectedTemplate: TemplateStyle | null;
+    extraOptions: ExtraOptions;
+}
+
+export interface CompleteEventData {
+    eventInfo: EventInfo;
+    selectedChannel: ChannelStyle | null;
+    selectedTemplate: EventTemplate | null;
     extraOptions: ExtraOptions;
 }

@@ -121,7 +121,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                   {courseItems.map((item) => (
                     <SidebarMenuItem key={item.id}>
                       <SidebarMenuButton
-                        className="w-full justify-between p-2 h-auto group cursor-pointer hover:bg-accent/50"
+                        className="w-full justify-between p-2 h-auto group cursor-pointer hover:bg-accent/50 "
                         onClick={() => {
                           console.log(`🎯 Clicked on course: "${item.title}"`);
                           loadItemData(item);

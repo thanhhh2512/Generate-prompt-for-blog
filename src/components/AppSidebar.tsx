@@ -28,7 +28,7 @@ import type { SidebarItem } from "@/lib/types";
 type AppSidebarProps = React.ComponentProps<typeof Sidebar>;
 
 export function AppSidebar({ ...props }: AppSidebarProps) {
-  const { items, updateItem, deleteItem, addItem } = useSidebarContext();
+  const { items, updateItem, deleteItem } = useSidebarContext();
   const { loadItemData, setActiveTab } = useFormDataStore();
   const [editingItem, setEditingItem] = useState<SidebarItem | null>(null);
   const [editTitle, setEditTitle] = useState("");
@@ -46,29 +46,6 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
 
     return () => clearTimeout(timer);
   }, [items.length]);
-
-  // Add some sample data for demonstration (only if no items exist)
-  React.useEffect(() => {
-    if (items.length === 0) {
-      console.log("📝 Thêm dữ liệu mẫu vì chưa có dữ liệu nào được lưu");
-      addItem({
-        title: "Python Programming Course",
-        type: "course",
-        data: {
-          courseName: "Python Programming Course",
-          startDate: "2024-01-15",
-        },
-      });
-      addItem({
-        title: "AI & Machine Learning Workshop",
-        type: "event",
-        data: {
-          name: "AI & Machine Learning Workshop",
-          time: "2024-02-01T09:00",
-        },
-      });
-    }
-  }, [items.length, addItem]);
 
   const handleEdit = (item: SidebarItem) => {
     setEditingItem(item);
@@ -261,7 +238,8 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
           {items.length === 0 && (
             <div className="flex items-center justify-center h-32 text-center">
               <div className="text-sm text-muted-foreground">
-                No saved items yet
+                Chưa lưu mục nào. Hãy tạo một mục mới từ tab Khóa học hoặc Sự
+                kiện.
               </div>
             </div>
           )}

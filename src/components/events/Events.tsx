@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Settings,
   Calendar,
@@ -37,7 +37,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 interface ToastProps {
   type: "success" | "error";
   message: string;
@@ -117,12 +124,21 @@ function Events() {
     setToast(null);
   };
 
+  // Track if data has been loaded to prevent infinite loops
+  const loadedItemRef = useRef<string | null>(null);
+
   // Load data from sidebar selection
   useEffect(() => {
-    if (selectedItem?.type === "event") {
+    if (
+      selectedItem?.type === "event" &&
+      selectedItem.id !== loadedItemRef.current
+    ) {
       const eventData = getEventData();
       if (eventData) {
         console.log("📅 Loading event data into form:", eventData);
+
+        // Mark this item as loaded to prevent re-loading
+        loadedItemRef.current = selectedItem.id;
 
         // Kiểm tra xem dữ liệu có đầy đủ hay chỉ có eventInfo cũ
         const dataAsRecord = eventData as unknown as Record<string, unknown>;
@@ -147,8 +163,12 @@ function Events() {
         }
 
         showToast("success", `Đã tải dữ liệu: "${selectedItem.title}"`);
-        // Clear selection after loading
-        setTimeout(() => clearSelectedItem(), 100);
+
+        // Clear selection after loading - use a delay to prevent infinite loop
+        setTimeout(() => {
+          clearSelectedItem();
+          loadedItemRef.current = null;
+        }, 100);
       }
     }
   }, [selectedItem, getEventData, clearSelectedItem]);
@@ -686,41 +706,48 @@ function Events() {
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="contentLength"
+                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Độ dài nội dung
                 </label>
-                <select
+                <Select
                   value={extraOptions.contentLength}
-                  onChange={(e) =>
+                  onValueChange={(value) =>
                     setExtraOptions((prev) => ({
                       ...prev,
-                      contentLength: e.target.value as
-                        | "short"
-                        | "medium"
-                        | "detailed",
+                      contentLength: value as "short" | "medium" | "detailed",
                     }))
                   }
-                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                 >
-                  <option value="short">📄 Ngắn gọn (50-100 từ)</option>
-                  <option value="medium">📃 Trung bình (100-200 từ)</option>
-                  <option value="detailed">📋 Chi tiết (200-300 từ)</option>
-                </select>
+                  <SelectTrigger className="w-full h-12" id="contentLength">
+                    <SelectValue placeholder="Chọn độ dài" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="short">Ngắn gọn (50-100 từ)</SelectItem>
+                    <SelectItem value="medium">
+                      Trung bình (100-200 từ)
+                    </SelectItem>
+                    <SelectItem value="detailed">
+                      Chi tiết (200-300 từ)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                 <div className="flex items-center">
-                  <input
-                    type="checkbox"
+                  <Checkbox
+                    className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 data-[state=checked]:text-primary-foreground"
                     id="emojis"
                     checked={extraOptions.withEmojis}
-                    onChange={(e) =>
+                    onCheckedChange={(checked) =>
                       setExtraOptions((prev) => ({
                         ...prev,
-                        withEmojis: e.target.checked,
+                        withEmojis: checked as boolean,
                       }))
                     }
-                    className="w-4 h-4 text-green-600 bg-gray-100 dark:bg-gray-600 border-gray-300 dark:border-gray-500 rounded focus:ring-green-500 focus:ring-2"
                   />
                   <label
                     htmlFor="emojis"
@@ -733,17 +760,16 @@ function Events() {
 
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                 <div className="flex items-center">
-                  <input
-                    type="checkbox"
+                  <Checkbox
+                    className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 data-[state=checked]:text-primary-foreground"
                     id="urgency"
                     checked={extraOptions.urgencyToggle}
-                    onChange={(e) =>
+                    onCheckedChange={(checked) =>
                       setExtraOptions((prev) => ({
                         ...prev,
-                        urgencyToggle: e.target.checked,
+                        urgencyToggle: checked as boolean,
                       }))
                     }
-                    className="w-4 h-4 text-green-600 bg-gray-100 dark:bg-gray-600 border-gray-300 dark:border-gray-500 rounded focus:ring-green-500 focus:ring-2"
                   />
                   <label
                     htmlFor="urgency"

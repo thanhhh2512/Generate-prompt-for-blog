@@ -125,8 +125,6 @@ function Events() {
     message: string;
   } | null>(null);
 
-  // NOTE: minimal change – added search state for template picker UX improvement.
-  // Do not alter existing template selection logic.
   const [templateSearchQuery, setTemplateSearchQuery] = useState<string>("");
 
   const showToast = (type: "success" | "error", message: string) => {
@@ -136,9 +134,6 @@ function Events() {
   const hideToast = () => {
     setToast(null);
   };
-
-  // NOTE: minimal change – added template filtering for improved UX.
-  // Keep existing template groups and preserve selection logic.
   const filteredTemplates = useMemo(() => {
     if (!templateSearchQuery.trim()) return eventTemplates;
     return eventTemplates.filter(
@@ -152,7 +147,6 @@ function Events() {
     );
   }, [templateSearchQuery]);
 
-  // Track if data has been loaded to prevent infinite loops
   const loadedItemRef = useRef<string | null>(null);
 
   // Load data from sidebar selection
@@ -163,15 +157,11 @@ function Events() {
     ) {
       const eventData = getEventData();
       if (eventData) {
-
-        // Mark this item as loaded to prevent re-loading
-
         loadedItemRef.current = selectedItem.id;
 
         // Kiểm tra xem dữ liệu có đầy đủ hay chỉ có eventInfo cũ
         const dataAsRecord = eventData as unknown as Record<string, unknown>;
         if (dataAsRecord.eventInfo) {
-          // Dữ liệu mới có đầy đủ thông tin
           const completeData = eventData as unknown as CompleteEventData;
           setEventInfo(completeData.eventInfo);
           setSelectedChannel(completeData.selectedChannel || null);
@@ -202,7 +192,6 @@ function Events() {
     }
 
     try {
-      // Bao gồm tất cả dữ liệu: thông tin sự kiện + tùy chọn bổ sung
       const completeData = {
         eventInfo,
         selectedChannel,
@@ -345,9 +334,7 @@ function Events() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Panel - Configuration (2 cols) */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Event Information */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center mb-6">
               <div className="w-10 h-10 bg-green-100 dark:bg-green-900/20 rounded-xl flex items-center justify-center mr-3">
@@ -635,8 +622,6 @@ function Events() {
             </div>
           </div>
 
-          {/* NOTE: moved duplicated Channel Selection UI into ChannelSelector.tsx for maintainability. */}
-          {/* Do not change selection logic or props interface. */}
           <ChannelSelector
             selectedChannel={selectedChannel}
             onChannelSelect={setSelectedChannel}
@@ -658,9 +643,6 @@ function Events() {
                 </p>
               </div>
             </div>
-
-            {/* NOTE: minimal change – added search bar for template filtering. */}
-            {/* Keep existing selection logic intact. */}
             <div className="mb-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -673,8 +655,6 @@ function Events() {
               </div>
             </div>
 
-            {/* NOTE: minimal change – grouped templates using accordion for better UX. */}
-            {/* Preserve existing template selection behavior. */}
             <Accordion
               type="multiple"
               className="w-full"
@@ -697,7 +677,7 @@ function Events() {
                           }
                         }}
                         tabIndex={0}
-                        className={`p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        className={`p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-sm focus:outline-none ${
                           selectedTemplate?.id === template.id
                             ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-sm"
                             : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"

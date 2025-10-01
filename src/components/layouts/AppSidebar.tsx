@@ -5,7 +5,6 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -119,8 +118,8 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                 <SidebarMenu>
                   {courseItems.map((item) => (
                     <SidebarMenuItem key={item.id}>
-                      <SidebarMenuButton
-                        className="w-full justify-between p-2 h-auto group cursor-pointer hover:bg-accent/50 "
+                      <div
+                        className="w-full justify-between p-2 h-auto group cursor-pointer hover:bg-accent/50 flex items-center gap-2 rounded-md"
                         onClick={() => {
                           loadItemData(item);
                           setActiveTab("courses");
@@ -163,7 +162,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
-                      </SidebarMenuButton>
+                      </div>
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
@@ -180,8 +179,8 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                 <SidebarMenu>
                   {eventItems.map((item) => (
                     <SidebarMenuItem key={item.id}>
-                      <SidebarMenuButton
-                        className="w-full justify-between p-2 h-auto group cursor-pointer hover:bg-accent/50"
+                      <div
+                        className="w-full justify-between p-2 h-auto group cursor-pointer hover:bg-accent/50 flex items-center gap-2 rounded-md"
                         onClick={() => {
                           loadItemData(item);
                           setActiveTab("events");
@@ -224,7 +223,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
-                      </SidebarMenuButton>
+                      </div>
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>

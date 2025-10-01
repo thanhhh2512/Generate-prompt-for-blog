@@ -651,7 +651,7 @@ function Courses() {
                             }
                           }}
                           tabIndex={0}
-                          className={`p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                          className={`p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-sm focus:outline-none ${
                             selectedTemplate?.id === template.id
                               ? "border-green-500 bg-green-50 dark:bg-green-900/20 shadow-sm"
                               : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
@@ -709,7 +709,7 @@ function Courses() {
                             }
                           }}
                           tabIndex={0}
-                          className={`p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                          className={`p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-sm focus:outline-none   ${
                             selectedTemplate?.id === template.id
                               ? "border-green-500 bg-green-50 dark:bg-green-900/20 shadow-sm"
                               : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"

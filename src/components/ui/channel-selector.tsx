@@ -65,7 +65,7 @@ export function ChannelSelector({
           iconColor: "text-purple-600 dark:text-purple-400",
           selectedBorder: "border-purple-500",
           selectedBg: "bg-purple-50 dark:bg-purple-900/20",
-          focusRing: "focus:ring-purple-500",
+          //   focusRing: "focus:ring-purple-500",
         };
     }
   };
@@ -122,7 +122,7 @@ export function ChannelSelector({
                     }
                   }}
                   tabIndex={0}
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-sm focus:outline-none focus:ring-2 ${
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-sm focus:outline-none  ${
                     styles.focusRing
                   } ${
                     selectedChannel?.id === channel.id

@@ -61,7 +61,7 @@ export function useSidebarItems() {
 
                     setItems(validItems);
                 } else {
-                    // No saved data found
+                    console.log(" Chưa có dữ liệu được lưu trong localStorage");
                 }
 
                 // Set version if not exists

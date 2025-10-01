@@ -1,4 +1,4 @@
-import { ModeToggle } from "@/components/mode-toggle";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 export function Header() {
   const imgUrl =

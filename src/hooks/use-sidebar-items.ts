@@ -60,9 +60,8 @@ export function useSidebarItems() {
                     );
 
                     setItems(validItems);
-                    console.log(`✅ Đã tải ${validItems.length} mục từ localStorage`);
                 } else {
-                    console.log("📂 Chưa có dữ liệu được lưu trong localStorage");
+                    // No saved data found
                 }
 
                 // Set version if not exists
@@ -70,7 +69,7 @@ export function useSidebarItems() {
                     safeLocalStorage.setItem(STORAGE_VERSION_KEY, STORAGE_VERSION);
                 }
             } catch (error) {
-                console.error("❌ Lỗi khi tải dữ liệu từ localStorage:", error);
+                console.error("Lỗi khi tải dữ liệu từ localStorage:", error);
                 setItems([]);
             } finally {
                 setIsLoading(false);
@@ -85,9 +84,8 @@ export function useSidebarItems() {
         try {
             safeLocalStorage.setItem(STORAGE_KEY, JSON.stringify(itemsToSave));
             safeLocalStorage.setItem(STORAGE_VERSION_KEY, STORAGE_VERSION);
-            console.log(`💾 Đã lưu ${itemsToSave.length} mục vào localStorage`);
         } catch (error) {
-            console.error("❌ Lỗi khi lưu vào localStorage:", error);
+            console.error("Lỗi khi lưu vào localStorage:", error);
         }
     }, []);
 
@@ -113,7 +111,6 @@ export function useSidebarItems() {
             );
 
             if (existingItem) {
-                console.log(`⚠️ Mục "${item.title}" đã tồn tại, cập nhật thay vì tạo mới`);
                 return prev.map(prevItem =>
                     prevItem.id === existingItem.id
                         ? { ...prevItem, ...item, createdAt: prevItem.createdAt } // Giữ nguyên createdAt
@@ -121,7 +118,6 @@ export function useSidebarItems() {
                 );
             }
 
-            console.log(`✅ Đã thêm mục mới: "${item.title}"`);
             return [newItem, ...prev];
         });
 
@@ -133,7 +129,6 @@ export function useSidebarItems() {
             const updated = prev.map((item) => {
                 if (item.id === id) {
                     const updatedItem = { ...item, ...updates };
-                    console.log(`📝 Đã cập nhật mục: "${updatedItem.title}"`);
                     return updatedItem;
                 }
                 return item;
@@ -144,10 +139,6 @@ export function useSidebarItems() {
 
     const deleteItem = useCallback((id: string) => {
         setItems((prev) => {
-            const itemToDelete = prev.find(item => item.id === id);
-            if (itemToDelete) {
-                console.log(`🗑️ Đã xóa mục: "${itemToDelete.title}"`);
-            }
             return prev.filter((item) => item.id !== id);
         });
     }, []);
@@ -160,7 +151,6 @@ export function useSidebarItems() {
     const clearAllItems = useCallback(() => {
         setItems([]);
         safeLocalStorage.removeItem(STORAGE_KEY);
-        console.log("🧹 Đã xóa tất cả dữ liệu");
     }, []);
 
     const exportItems = useCallback(() => {
@@ -172,7 +162,6 @@ export function useSidebarItems() {
         link.download = `marketing-generator-backup-${new Date().toISOString().split('T')[0]}.json`;
         link.click();
         URL.revokeObjectURL(url);
-        console.log("📤 Đã xuất dữ liệu");
     }, [items]);
 
     const importItems = useCallback((jsonString: string) => {
@@ -185,10 +174,9 @@ export function useSidebarItems() {
                 (item.type === "course" || item.type === "event")
             );
             setItems(validItems);
-            console.log(`📥 Đã nhập ${validItems.length} mục`);
             return true;
         } catch (error) {
-            console.error("❌ Lỗi khi nhập dữ liệu:", error);
+            console.error("Lỗi khi nhập dữ liệu:", error);
             return false;
         }
     }, []);

@@ -2,7 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { GraduationCap, Calendar } from "lucide-react";
 import { Layout } from "@/Layout";
-import { AppSidebar } from "@/components/AppSidebar";
+import { AppSidebar } from "@/components/layouts/AppSidebar";
 import { SidebarItemsProvider } from "@/contexts/SidebarContext";
 import { useFormDataStore } from "@/stores/form-data-store";
 import Courses from "./components/courses/Courses";

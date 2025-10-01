@@ -21,7 +21,6 @@ class FormDataManager {
     }
 
     loadItemData(item: SidebarItem) {
-        console.log(`📋 Loading data for: "${item.title}"`);
         this._selectedItem = item;
         this._activeTab = item.type === "course" ? "courses" : "events";
         this.notifyListeners();

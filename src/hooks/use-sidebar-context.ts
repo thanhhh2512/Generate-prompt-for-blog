@@ -26,10 +26,9 @@ export function useSaveToSidebar() {
                 data,
             });
 
-            console.log(`💾 Đã lưu "${title}" vào localStorage`);
             return { success: true, item: savedItem, message: "Đã lưu thành công!" };
         } catch (error) {
-            console.error("❌ Lỗi khi lưu:", error);
+            console.error("Lỗi khi lưu:", error);
             return {
                 success: false,
                 item: null,

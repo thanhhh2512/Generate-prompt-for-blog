@@ -39,7 +39,6 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
     let hasRun = false;
     const timer = setTimeout(() => {
       if (!hasRun && items.length > 0) {
-        console.log(`🔄 Đã khôi phục ${items.length} mục`);
         hasRun = true;
       }
     }, 1000);
@@ -123,7 +122,6 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                       <SidebarMenuButton
                         className="w-full justify-between p-2 h-auto group cursor-pointer hover:bg-accent/50 "
                         onClick={() => {
-                          console.log(`🎯 Clicked on course: "${item.title}"`);
                           loadItemData(item);
                           setActiveTab("courses");
                         }}
@@ -185,7 +183,6 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                       <SidebarMenuButton
                         className="w-full justify-between p-2 h-auto group cursor-pointer hover:bg-accent/50"
                         onClick={() => {
-                          console.log(`🎯 Clicked on event: "${item.title}"`);
                           loadItemData(item);
                           setActiveTab("events");
                         }}

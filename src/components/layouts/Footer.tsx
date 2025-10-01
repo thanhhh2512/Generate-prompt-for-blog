@@ -18,7 +18,7 @@ export function Footer() {
               Website tạo nội dung marketing chuyên nghiệp bằng AI
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              version 1.1.2
+              version 2.2.1
             </p>
           </div>
 

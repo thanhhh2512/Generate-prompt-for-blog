@@ -466,7 +466,7 @@ function Courses() {
                   htmlFor="learningMode"
                   className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  Hình thức học *
+                  Hình thức học <span className="text-red-500">*</span>
                 </label>
                 <Select
                   value={courseInfo.learningMode}

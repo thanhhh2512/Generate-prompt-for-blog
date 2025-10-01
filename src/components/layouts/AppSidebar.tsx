@@ -32,6 +32,8 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
   const [editingItem, setEditingItem] = useState<SidebarItem | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [deletingItem, setDeletingItem] = useState<SidebarItem | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Thông báo khi load dữ liệu từ localStorage (chỉ chạy một lần)
   React.useEffect(() => {
@@ -66,8 +68,22 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
     setEditTitle("");
   };
 
-  const handleDelete = (id: string) => {
-    deleteItem(id);
+  const handleDelete = (item: SidebarItem) => {
+    setDeletingItem(item);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingItem) {
+      deleteItem(deletingItem.id);
+      setIsDeleteDialogOpen(false);
+      setDeletingItem(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+    setDeletingItem(null);
   };
 
   const getIconForType = (type: string) => {
@@ -156,7 +172,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                             className="h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDelete(item.id);
+                              handleDelete(item);
                             }}
                           >
                             <Trash2 className="h-3 w-3" />
@@ -199,7 +215,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                             </div>
                           </div>
                         </div>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity ">
                           <Button
                             variant="ghost"
                             size="sm"
@@ -217,7 +233,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                             className="h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDelete(item.id);
+                              handleDelete(item);
                             }}
                           >
                             <Trash2 className="h-3 w-3" />
@@ -271,6 +287,27 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
             </Button>
             <Button onClick={handleSaveEdit} disabled={!editTitle.trim()}>
               Save changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn xóa mục "{deletingItem?.title}" không? Hành
+              động này không thể hoàn tác.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelDelete}>
+              Hủy
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Xóa
             </Button>
           </DialogFooter>
         </DialogContent>

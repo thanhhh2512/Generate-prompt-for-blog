@@ -28,7 +28,7 @@ function App() {
                 className="w-full"
               >
                 <div className="flex justify-center mb-6">
-                  <TabsList className="grid w-full max-w-md grid-cols-2">
+                  <TabsList className="grid w-full max-w-md grid-cols-2 relative">
                     <TabsTrigger
                       value="courses"
                       className="flex items-center gap-2"

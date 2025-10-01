@@ -11,9 +11,7 @@ import {
   Users,
   Gift,
   Globe,
-  Save,
   CalendarIcon,
-  CircleCheckBig,
   FileText,
   Search,
 } from "lucide-react";
@@ -31,6 +29,7 @@ import { generateEventPrompt } from "@/utils/promptGenerator";
 import { useSidebarContext } from "@/hooks/use-sidebar-context";
 import { useFormDataStore } from "@/stores/form-data-store";
 import { ChannelSelector } from "@/components/ui/channel-selector";
+import { GeneratedPromptPanel } from "@/components/ui/generated-prompt-panel";
 import { Button } from "../ui/button";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import {
@@ -333,7 +332,7 @@ function Events() {
         <Toast type={toast.type} message={toast.message} onClose={hideToast} />
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center mb-6">
@@ -830,67 +829,19 @@ function Events() {
           </div>
         </div>
 
-        {/* Right Panel - Generated Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/20 rounded-xl flex items-center justify-center mr-3">
-                <Zap className="w-5 h-5 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                  Generated Prompt
-                </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Nội dung marketing cho sự kiện
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={saveToSidebar}
-                disabled={!eventInfo.name.trim()}
-                className="flex items-center gap-2 px-4 py-2 h-12 w-20 rounded-xl font-medium transition-all bg-green-200 dark:bg-blue-900/20 hover:bg-green-300 dark:hover:bg-blue-900/30 text-green-600 dark:text-green-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-              >
-                <Save className="w-4 h-4" />
-                Lưu
-              </Button>
-              {generatedPrompt && (
-                <Button
-                  onClick={copyToClipboard}
-                  className="flex items-center gap-2 px-4 py-2 h-12 w-20 rounded-xl font-medium transition-all bg-gray-200 dark:bg-blue-900/20 hover:bg-gray-300 dark:hover:bg-blue-900/30 text-gray-600 dark:text-green-600 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 "
-                >
-                  {copied ? <CircleCheckBig /> : "Sao chép"}
-                </Button>
-              )}
-            </div>
-          </div>
-
-          <div className="p-6">
-            {generatedPrompt ? (
-              <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 min-h-[400px] overflow-y-auto border border-gray-200 dark:border-gray-600">
-                <pre className="whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200 font-mono leading-relaxed">
-                  {generatedPrompt}
-                </pre>
-              </div>
-            ) : (
-              <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-8 min-h-[400px] flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600 border-dashed">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Calendar className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Sẵn sàng tạo nội dung
-                  </h3>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">
-                    Điền thông tin sự kiện bên trái và nhấn "Tạo Prompt" để tạo
-                    nội dung marketing chuyên nghiệp
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* NOTE: moved duplicated Generated Prompt UI into GeneratedPromptPanel.tsx for reuse. */}
+        {/* Do not change prompt generation logic or data shape. */}
+        <GeneratedPromptPanel
+          generatedPrompt={generatedPrompt}
+          copied={copied}
+          onSave={saveToSidebar}
+          onCopy={copyToClipboard}
+          canSave={eventInfo.name.trim() !== ""}
+          variant="green"
+          title="Generated Prompt"
+          description="Nội dung marketing cho sự kiện"
+          emptyStateDescription="Điền thông tin sự kiện bên trái và nhấn &quot;Tạo Prompt&quot; để tạo nội dung marketing chuyên nghiệp"
+        />
       </div>
     </div>
   );

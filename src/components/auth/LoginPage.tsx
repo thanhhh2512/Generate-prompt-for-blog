@@ -114,14 +114,6 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
               </Button>
             </form>
           </Form>
-          
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p className="mb-2">Tài khoản demo:</p>
-            <div className="space-y-1 text-xs">
-              <p><strong>thanh</strong> / yourpassword</p>
-              <p><strong>friend</strong> / friendpassword</p>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>

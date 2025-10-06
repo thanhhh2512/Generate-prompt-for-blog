@@ -565,10 +565,11 @@ function Courses() {
                           )
                         }
                         className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        placeholder="#Python #Programming"
+                        placeholder="#Python"
                       />
                       {courseInfo.relatedHashtags.length > 1 && (
                         <button
+                          aria-label="Xoá hashtag"
                           onClick={() =>
                             removeArrayItem("relatedHashtags", index)
                           }
@@ -854,10 +855,11 @@ function Courses() {
           <div className="sticky bottom-6">
             <button
               onClick={generateContent}
-              className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-3 hover:scale-105"
+              aria-label="Tạo Prompt"
+              className="w-full min-h-[48px] bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-3 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
             >
-              <Zap className="w-5 h-5" />
-              Tạo Prompt
+              <Zap className="w-5 h-5" aria-hidden="true" />
+              <span>Tạo Prompt</span>
             </button>
           </div>
         </div>

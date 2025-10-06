@@ -158,6 +158,7 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                           <Button
                             variant="ghost"
                             size="sm"
+                            aria-label="Chỉnh sửa mục"
                             className="h-6 w-6 p-0 hover:bg-accent"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -166,9 +167,11 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
                           >
                             <Edit3 className="h-3 w-3" />
                           </Button>
+
                           <Button
                             variant="ghost"
                             size="sm"
+                            aria-label="Xóa mục"
                             className="h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
                             onClick={(e) => {
                               e.stopPropagation();

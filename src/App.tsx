@@ -9,13 +9,18 @@ import Courses from "./components/courses/Courses";
 import Events from "./components/events/Events";
 // import "./App.css";
 
-function App() {
+// NOTE: Added logout prop for authentication. Do not refactor core app logic.
+interface AppProps {
+  onLogout?: () => void;
+}
+
+function App({ onLogout }: AppProps = {}) {
   const { activeTab, setActiveTab } = useFormDataStore();
 
   return (
     <SidebarItemsProvider>
       <SidebarProvider>
-        <AppSidebar />
+        <AppSidebar onLogout={onLogout} />
         <SidebarInset>
           <Layout>
             <div className="container mx-auto">

@@ -19,21 +19,34 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Edit3, GraduationCap, Calendar } from "lucide-react";
+import { Trash2, Edit3, GraduationCap, Calendar, LogOut } from "lucide-react";
 import { useSidebarContext } from "@/hooks/use-sidebar-context";
 import { useFormDataStore } from "@/stores/form-data-store";
+import { useAuthStore } from "@/stores/auth-store";
+import { useToast } from "@/hooks/use-toast";
 import type { SidebarItem } from "@/lib/types";
 
-type AppSidebarProps = React.ComponentProps<typeof Sidebar>;
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  onLogout?: () => void;
+};
 
-export function AppSidebar({ ...props }: AppSidebarProps) {
+export function AppSidebar({ onLogout, ...props }: AppSidebarProps) {
   const { items, updateItem, deleteItem } = useSidebarContext();
   const { loadItemData, setActiveTab } = useFormDataStore();
+  const { logout, user } = useAuthStore();
+  const { showToast } = useToast();
   const [editingItem, setEditingItem] = useState<SidebarItem | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState<SidebarItem | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  // NOTE: Added logout handler for authentication
+  const handleLogout = () => {
+    logout();
+    showToast("success", "Đã đăng xuất");
+    onLogout?.();
+  };
 
   // Thông báo khi load dữ liệu từ localStorage (chỉ chạy một lần)
   React.useEffect(() => {
@@ -113,13 +126,31 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
     <>
       <Sidebar className="w-64 border-r border-border/40" {...props}>
         <SidebarHeader className="border-b border-border/40 px-4 py-3">
-          <div className="space-y-2">
-            <h2 className="text-lg font-semibold text-foreground">
-              Saved Items
-            </h2>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>{items.length} mục đã lưu</span>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-foreground">
+                Saved Items
+              </h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                title="Đăng xuất"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span>{items.length} mục đã lưu</span>
+              </div>
+              {user && (
+                <div className="text-xs text-muted-foreground">
+                  {user.username}
+                </div>
+              )}
             </div>
           </div>
         </SidebarHeader>

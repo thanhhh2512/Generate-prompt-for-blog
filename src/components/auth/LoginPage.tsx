@@ -6,8 +6,21 @@ import * as z from "zod";
 import { useAuthStore } from "@/stores/auth-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn } from "lucide-react";
 
@@ -38,12 +51,12 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    
+
     // Simulate loading for better UX
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const success = login(data.username, data.password);
-    
+
     if (success) {
       showToast("success", `Chào mừng ${data.username}!`);
       onLoginSuccess();
@@ -51,7 +64,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
       showToast("error", "Sai tên đăng nhập hoặc mật khẩu");
       form.reset();
     }
-    
+
     setIsLoading(false);
   };
 
@@ -105,9 +118,9 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                   </FormItem>
                 )}
               />
-              <Button 
-                type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
+              <Button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 disabled={isLoading}
               >
                 {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}

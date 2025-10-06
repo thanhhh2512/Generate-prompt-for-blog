@@ -9,10 +9,10 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
   const { checkAuth } = useAuthStore();
-  
+
   if (!checkAuth()) {
     return <>{fallback}</>;
   }
-  
+
   return <>{children}</>;
 }

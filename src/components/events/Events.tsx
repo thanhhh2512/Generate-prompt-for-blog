@@ -840,7 +840,7 @@ function Events() {
           variant="green"
           title="Generated Prompt"
           description="Nội dung marketing cho sự kiện"
-          emptyStateDescription="Điền thông tin sự kiện bên trái và nhấn &quot;Tạo Prompt&quot; để tạo nội dung marketing chuyên nghiệp"
+          emptyStateDescription='Điền thông tin sự kiện bên trái và nhấn "Tạo Prompt" để tạo nội dung marketing chuyên nghiệp'
         />
       </div>
     </div>

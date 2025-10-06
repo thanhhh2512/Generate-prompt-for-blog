@@ -9,17 +9,17 @@ interface GeneratedPromptPanelProps {
   // Content props
   generatedPrompt: string;
   copied: boolean;
-  
+
   // Actions
   onSave: () => void;
   onCopy: () => void;
-  
+
   // Validation
   canSave: boolean;
-  
+
   // Theme variant for different color schemes
   variant?: "blue" | "green";
-  
+
   // Panel customization
   title?: string;
   description?: string;
@@ -38,7 +38,7 @@ export function GeneratedPromptPanel({
   title = "Generated Prompt",
   description = "Nội dung marketing đã được tạo",
   emptyStateTitle = "Sẵn sàng tạo nội dung",
-  emptyStateDescription = "Điền thông tin bên trái và nhấn \"Tạo Prompt\" để tạo nội dung marketing chuyên nghiệp",
+  emptyStateDescription = 'Điền thông tin bên trái và nhấn "Tạo Prompt" để tạo nội dung marketing chuyên nghiệp',
   emptyStateIcon,
 }: GeneratedPromptPanelProps) {
   // Theme configuration based on variant
@@ -46,25 +46,30 @@ export function GeneratedPromptPanel({
     blue: {
       headerIcon: "bg-blue-100 dark:bg-blue-900/20",
       headerIconColor: "text-blue-600 dark:text-blue-400",
-      saveButton: "bg-blue-100 dark:bg-blue-900/20 hover:bg-blue-200 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-400",
-      copyButton: "bg-gray-200 dark:bg-blue-900/20 hover:bg-gray-300 dark:hover:bg-blue-900/30 text-gray-600 dark:text-blue-400",
+      saveButton:
+        "bg-blue-100 dark:bg-blue-900/20 hover:bg-blue-200 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-400",
+      copyButton:
+        "bg-gray-200 dark:bg-blue-900/20 hover:bg-gray-300 dark:hover:bg-blue-900/30 text-gray-600 dark:text-blue-400",
     },
     green: {
       headerIcon: "bg-green-100 dark:bg-green-900/20",
       headerIconColor: "text-green-600 dark:text-green-400",
-      saveButton: "bg-green-200 dark:bg-blue-900/20 hover:bg-green-300 dark:hover:bg-blue-900/30 text-green-600 dark:text-green-600",
-      copyButton: "bg-gray-200 dark:bg-blue-900/20 hover:bg-gray-300 dark:hover:bg-blue-900/30 text-gray-600 dark:text-green-600",
+      saveButton:
+        "bg-green-200 dark:bg-blue-900/20 hover:bg-green-300 dark:hover:bg-blue-900/30 text-green-600 dark:text-green-600",
+      copyButton:
+        "bg-gray-200 dark:bg-blue-900/20 hover:bg-gray-300 dark:hover:bg-blue-900/30 text-gray-600 dark:text-green-600",
     },
   };
 
   const theme = themeConfig[variant];
 
   // Default empty state icon based on variant
-  const defaultEmptyIcon = variant === "green" ? (
-    <Calendar className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-  ) : (
-    <Zap className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-  );
+  const defaultEmptyIcon =
+    variant === "green" ? (
+      <Calendar className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+    ) : (
+      <Zap className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+    );
 
   return (
     // NOTE: Made panel sticky for improved UX while maintaining responsive behavior
@@ -72,7 +77,9 @@ export function GeneratedPromptPanel({
     <div className="sticky top-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow max-h-[calc(100vh-2rem)] overflow-hidden">
       <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <div className="flex items-center">
-          <div className={`w-10 h-10 ${theme.headerIcon} rounded-xl flex items-center justify-center mr-3`}>
+          <div
+            className={`w-10 h-10 ${theme.headerIcon} rounded-xl flex items-center justify-center mr-3`}
+          >
             <Zap className={`w-5 h-5 ${theme.headerIconColor}`} />
           </div>
           <div>

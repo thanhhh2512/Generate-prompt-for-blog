@@ -1,6 +1,12 @@
 // NOTE: Added 404 page for unauthorized access and invalid routes. Do not refactor core app logic.
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 
 interface NotFoundPageProps {
@@ -24,7 +30,7 @@ export function NotFoundPage({ onBackToLogin }: NotFoundPageProps) {
           <p className="text-sm text-muted-foreground mb-6">
             Vui lòng đăng nhập để truy cập ứng dụng Marketing Generator.
           </p>
-          <Button 
+          <Button
             onClick={onBackToLogin}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
           >

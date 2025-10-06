@@ -48,7 +48,9 @@ export function AuthApp() {
   }
 
   return (
-    <ProtectedRoute fallback={<NotFoundPage onBackToLogin={handleBackToLogin} />}>
+    <ProtectedRoute
+      fallback={<NotFoundPage onBackToLogin={handleBackToLogin} />}
+    >
       <App onLogout={handleLogout} />
     </ProtectedRoute>
   );
